@@ -1,0 +1,23 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="ru.mobilap.applovinmax">
+
+  <application android:hardwareAccelerated="true" android:networkSecurityConfig="@xml/network_security_config">
+    <!--
+    Plugin metadata:
+    - In the `android:name` attribute, the `org.godotengine.plugin.v1` prefix
+    is required so Godot can recognize the project as a valid Godot
+    Android plugin. The plugin name following the prefix should match the value
+    of the plugin name returned by the plugin initializer.
+    - The `android:value` attribute should be the classpath to the plugin
+    initializer.
+    -->
+    <meta-data
+        android:name="org.godotengine.plugin.v1.AppLovinMax"
+        android:value="ru.mobilap.applovinmax.AppLovinMax" />
+
+    <meta-data android:name="com.google.android.gms.ads.AD_MANAGER_APP" android:value="true"/>
+  </application>
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-feature android:name="android.hardware.location.network" />
+</manifest>

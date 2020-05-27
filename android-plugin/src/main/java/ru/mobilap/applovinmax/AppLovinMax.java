@@ -1,4 +1,4 @@
-package org.godotengine.godot;
+package ru.mobilap.applovinmax;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -13,13 +13,21 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Locale;
+
+import org.godotengine.godot.Godot;
+import org.godotengine.godot.GodotLib;
+import org.godotengine.godot.plugin.GodotPlugin;
+import org.godotengine.godot.plugin.SignalInfo;
 
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.applovin.sdk.AppLovinPrivacySettings;
+import com.applovin.sdk.AppLovinSdkSettings;
 import com.applovin.sdk.AppLovinSdkUtils;
 
 import com.applovin.mediation.MaxAd;
@@ -31,9 +39,9 @@ import com.applovin.mediation.ads.MaxAdView;
 import com.applovin.mediation.ads.MaxInterstitialAd;
 import com.applovin.mediation.ads.MaxRewardedAd;
 
-public class GodotApplovinMax extends Godot.SingletonBase
+public class AppLovinMax extends GodotPlugin
 {
-    private final String TAG = GodotApplovinMax.class.getName();
+    private final String TAG = AppLovinMax.class.getName();
 	private Activity activity = null; // The main activity of the game
 
     private HashMap<String, MaxInterstitialAd> interstitials = new HashMap<>();
@@ -45,29 +53,82 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	private FrameLayout layout = null; // Store the layout
     private AppLovinSdk sdk = null;
     private boolean _inited = false;
+    private boolean gdprApplies;
 
 	/* Init
 	 * ********************************************************************** */
 
 	/**
-	 * Prepare for work with YandexAds
+	 * Prepare for work with ApplovinMax
 	 * @param boolean ProductionMode Tell if the enviroment is for real or test
 	 * @param int gdscript instance id
 	 */
-	public void init(boolean ProductionMode) {
+	public void init(final String sdkKey, boolean ProductionMode) {
 
 		this.ProductionMode = ProductionMode;
-        //if(!ProductionMode) sdk.getSettings().setVerboseLogging( true );
         layout = (FrameLayout)activity.getWindow().getDecorView().getRootView();
+        sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(), activity);
+        //if(!ProductionMode) sdk.getSettings().setVerboseLogging( true );
+        sdk.setMediationProvider( AppLovinMediationProvider.MAX );
+        sdk.initializeSdk(new AppLovinSdk.SdkInitializationListener() {
+                @Override
+                public void onSdkInitialized(final AppLovinSdkConfiguration configuration)
+                {
+                    _inited = true;
+                    Log.i(TAG, "ApplovinMAX initialized");
+                    if ( configuration.getConsentDialogState() == AppLovinSdkConfiguration.ConsentDialogState.APPLIES ) {
+                        // Show user consent dialog
+                        Log.i(TAG, "GDPR applies");
+                        gdprApplies = true;
+                    } else if ( configuration.getConsentDialogState() == AppLovinSdkConfiguration.ConsentDialogState.DOES_NOT_APPLY ) {
+                        // No need to show consent dialog, proceed with initialization
+                        Log.i(TAG, "GDPR doesn't applies");
+                        gdprApplies = false;
+                    } else {
+                        // Consent dialog state is unknown. Proceed with initialization, but check if the consent
+                        // dialog should be shown on the next application initialization
+                        Log.i(TAG, "GDPR status unknown");
+                        gdprApplies = false;
+                    }
+                }
+            } );
 	}
 
+    public boolean isInited() {
+        return _inited;
+    }
+
+    public void setUserId(final String uid) {
+        sdk.setUserIdentifier( uid );
+    }
+
+    public boolean isGdprApplies() {
+        return gdprApplies;
+    }
+    
+    public void debugMediation() {
+        sdk.showMediationDebugger();
+    }
+
+    public void setGdprConsent(final boolean consent) {
+        AppLovinPrivacySettings.setHasUserConsent( consent, activity );
+    }
+
+    public void setAgeRestricted(final boolean ageRestricted) {
+        AppLovinPrivacySettings.setIsAgeRestrictedUser( ageRestricted, activity );
+    }
+
+    public void setCCPAApplied(final boolean ccpaApplied) {
+        AppLovinPrivacySettings.setDoNotSell( ccpaApplied, activity );
+    }
+    
 	/* Rewarded Video
 	 * ********************************************************************** */
 	private MaxRewardedAd initRewardedVideo(final String id, final int callback_id)
 	{
         Log.w(TAG, "Prepare rewarded video: "+id+" callback: "+Integer.toString(callback_id));
 
-        MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, activity );
+        MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, sdk, activity );
         rewardedAd.setListener(new MaxRewardedAdListener() {
                 @Override
                 public void onAdLoaded(final MaxAd maxAd) {
@@ -129,12 +190,12 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	 */
 	public void loadRewardedVideo(final String id, final int callback_id) {
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                MaxRewardedAd rewardedAd = initRewardedVideo(id, callback_id);
-                rewardedAd.loadAd();
-                rewardeds.put(id, rewardedAd);
-			}
-		});
+                @Override public void run() {
+                    MaxRewardedAd rewardedAd = initRewardedVideo(id, callback_id);
+                    rewardedAd.loadAd();
+                    rewardeds.put(id, rewardedAd);
+                }
+            });
 	}
 
 	/**
@@ -153,13 +214,6 @@ public class GodotApplovinMax extends Godot.SingletonBase
             });
 	}
 
-    /*
-    public boolean isRewardedVideoLoaded(final String id)
-    {
-        return rewardedVideoAd != null && rewardedVideoAd.isLoaded();
-    }
-    */
-
 	/* Banner
 	 * ********************************************************************** */
 
@@ -167,7 +221,7 @@ public class GodotApplovinMax extends Godot.SingletonBase
     {
 
         // Create an ad view with a specific zone to load ads for
-        MaxAdView adView = new MaxAdView( id, activity );
+        MaxAdView adView = new MaxAdView( id, sdk, activity );
 
         // Optional: Set listeners
         adView.setListener( new MaxAdViewAdListener() {
@@ -202,9 +256,9 @@ public class GodotApplovinMax extends Godot.SingletonBase
             });
 
         FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
-                                                FrameLayout.LayoutParams.MATCH_PARENT,
-                                                AppLovinSdkUtils.dpToPx( activity, 50 )
-                                                );
+                                                                         FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                         AppLovinSdkUtils.dpToPx( activity, 50 )
+                                                                         );
         if(isOnTop) adParams.gravity = Gravity.TOP;
         else adParams.gravity = Gravity.BOTTOM;
         adView.setBackgroundColor(/* Color.WHITE */Color.TRANSPARENT);
@@ -220,17 +274,17 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	public void loadBanner(final String id, final boolean isOnTop, final int callback_id)
 	{
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                if(!banners.containsKey(id)) {
-                    MaxAdView adView = initBanner(id, isOnTop, callback_id);
-                    adView.loadAd();
-                    banners.put(id, adView);
-				} else {
-                    MaxAdView adView = banners.get(id);
-                    adView.loadAd();
+                @Override public void run() {
+                    if(!banners.containsKey(id)) {
+                        MaxAdView adView = initBanner(id, isOnTop, callback_id);
+                        adView.loadAd();
+                        banners.put(id, adView);
+                    } else {
+                        MaxAdView adView = banners.get(id);
+                        adView.loadAd();
+                    }
                 }
-			}
-		});
+            });
 	}
 
 	/**
@@ -239,24 +293,24 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	public void showBanner(final String id)
 	{
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                if(banners.containsKey(id)) {
-                    MaxAdView b = banners.get(id);
-                    b.setVisibility(View.VISIBLE);
-                    b.startAutoRefresh();
-                    for (String key : banners.keySet()) {
-                        if(!key.equals(id)) {
-                            MaxAdView b2 = banners.get(key);
-                            b2.setVisibility(View.GONE);
-                            b2.stopAutoRefresh();
+                @Override public void run() {
+                    if(banners.containsKey(id)) {
+                        MaxAdView b = banners.get(id);
+                        b.setVisibility(View.VISIBLE);
+                        b.startAutoRefresh();
+                        for (String key : banners.keySet()) {
+                            if(!key.equals(id)) {
+                                MaxAdView b2 = banners.get(key);
+                                b2.setVisibility(View.GONE);
+                                b2.stopAutoRefresh();
+                            }
                         }
+                        Log.d(TAG, "Show Banner");
+                    } else {
+                        Log.w(TAG, "Banner not found: "+id);
                     }
-                    Log.d(TAG, "Show Banner");
-                } else {
-                    Log.w(TAG, "Banner not found: "+id);
                 }
-			}
-		});
+            });
 	}
 
     public void removeBanner(final String id)
@@ -281,17 +335,17 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	public void hideBanner(final String id)
 	{
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                if(banners.containsKey(id)) {
-                    MaxAdView b = banners.get(id);
-                    b.setVisibility(View.GONE);
-                    b.stopAutoRefresh();
-                    Log.d(TAG, "Hide Banner");
-                } else {
-                    Log.w(TAG, "Banner not found: "+id);
+                @Override public void run() {
+                    if(banners.containsKey(id)) {
+                        MaxAdView b = banners.get(id);
+                        b.setVisibility(View.GONE);
+                        b.stopAutoRefresh();
+                        Log.d(TAG, "Hide Banner");
+                    } else {
+                        Log.w(TAG, "Banner not found: "+id);
+                    }
                 }
-			}
-		});
+            });
 	}
 
 	/**
@@ -334,7 +388,7 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	 * ********************************************************************** */
     private MaxInterstitialAd initInterstitial(final String id, final int callback_id)
     {
-        MaxInterstitialAd interstitial = new MaxInterstitialAd( id, activity );
+        MaxInterstitialAd interstitial = new MaxInterstitialAd( id, sdk, activity );
         interstitial.setListener(new MaxAdListener() {
                 @Override
                 public void onAdLoaded(final MaxAd maxAd) {
@@ -376,13 +430,13 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	public void loadInterstitial(final String id, final int callback_id)
 	{
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                // Load an ad for a given zone
-                MaxInterstitialAd interstitial = initInterstitial(id, callback_id);
-                interstitial.loadAd();
-                interstitials.put(id, interstitial);
-			}
-		});
+                @Override public void run() {
+                    // Load an ad for a given zone
+                    MaxInterstitialAd interstitial = initInterstitial(id, callback_id);
+                    interstitial.loadAd();
+                    interstitials.put(id, interstitial);
+                }
+            });
 	}
 
 	/**
@@ -391,23 +445,16 @@ public class GodotApplovinMax extends Godot.SingletonBase
 	public void showInterstitial(final String id)
 	{
 		activity.runOnUiThread(new Runnable() {
-			@Override public void run() {
-                if(interstitials.containsKey(id)) {
-                    MaxInterstitialAd interstitial = interstitials.get(id);
-                    interstitial.showAd();
-                } else {
-                    Log.w(TAG, "Interstitial not found: " + id);
+                @Override public void run() {
+                    if(interstitials.containsKey(id)) {
+                        MaxInterstitialAd interstitial = interstitials.get(id);
+                        interstitial.showAd();
+                    } else {
+                        Log.w(TAG, "Interstitial not found: " + id);
+                    }
                 }
-			}
-		});
+            });
 	}
-
-    /*
-    public boolean isInterstitialLoaded(final String id)
-    {
-        return interstitialAd != null && interstitialAd.isLoaded();
-    }
-    */
 
 	/* Utils
 	 * ********************************************************************** */
@@ -415,52 +462,39 @@ public class GodotApplovinMax extends Godot.SingletonBase
 
 	/* Definitions
 	 * ********************************************************************** */
+    public AppLovinMax(Godot godot) 
+    {
+        super(godot);
+        activity = godot;
+    }
 
-	/**
-	 * Initilization Singleton
-	 * @param Activity The main activity
-	 */
- 	static public Godot.SingletonBase initialize(Activity activity)
- 	{
- 		return new GodotApplovinMax(activity);
- 	}
+    @Override
+    public String getPluginName() {
+        return "AppLovinMax";
+    }
 
-	/**
-	 * Constructor
-	 * @param Activity Main activity
-	 */
-	public GodotApplovinMax(Activity p_activity) {
-		registerClass("ApplovinMax", new String[] {
-			"init",
-			"initWithContentRating",
-			// banner
-			"loadBanner", "showBanner", "hideBanner", "removeBanner", "getBannerWidth", "getBannerHeight", //"resize",
-			// Interstitial
-			"loadInterstitial", "showInterstitial", //"isInterstitialLoaded",
-			// Rewarded video
-			"loadRewardedVideo", "showRewardedVideo" //, "isRewardedVideoLoaded"
-		});
-		activity = p_activity;
-        sdk = AppLovinSdk.getInstance(activity);
-        sdk.setMediationProvider( AppLovinMediationProvider.MAX );
-        AppLovinSdk.initializeSdk( activity, new AppLovinSdk.SdkInitializationListener() {
-            @Override
-            public void onSdkInitialized(final AppLovinSdkConfiguration configuration)
-            {
-                _inited = true;
-                Log.i(TAG, "ApplovinMAX initialized");
-                if ( configuration.getConsentDialogState() == AppLovinSdkConfiguration.ConsentDialogState.APPLIES ) {
-                    // Show user consent dialog
-                } else if ( configuration.getConsentDialogState() == AppLovinSdkConfiguration.ConsentDialogState.DOES_NOT_APPLY ) {
-                    // No need to show consent dialog, proceed with initialization
-                } else {
-                    // Consent dialog state is unknown. Proceed with initialization, but check if the consent
-                    // dialog should be shown on the next application initialization
-                }
-            }
-        } );
-        AppLovinPrivacySettings.setHasUserConsent( true, activity );
-        AppLovinPrivacySettings.setIsAgeRestrictedUser( false, activity );
-        AppLovinPrivacySettings.setDoNotSell( false, activity );
-	}
+    @Override
+    public List<String> getPluginMethods() {
+        return Arrays.asList(
+                "init", "isInited", "setUserId", "debugMediation", "isGdprApplies", "setGdprConsent", "setAgeRestricted", "setCCPAApplied", 
+                // banner
+                "loadBanner", "showBanner", "hideBanner", "removeBanner", "getBannerWidth", "getBannerHeight",
+                // Interstitial
+                "loadInterstitial", "showInterstitial",
+                // Rewarded video
+                "loadRewardedVideo", "showRewardedVideo"
+        );
+    }
+
+    /*
+    @Override
+    public Set<SignalInfo> getPluginSignals() {
+        return Collections.singleton(loggedInSignal);
+    }
+    */
+
+    @Override
+    public View onMainCreateView(Activity activity) {
+        return null;
+    }
 }
