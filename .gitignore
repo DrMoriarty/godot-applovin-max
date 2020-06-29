@@ -1,0 +1,8 @@
+*.pyc
+.DS_Store
+*.import
+.import
+*.o
+*.d
+*.framework
+ios-plugin/.sconsign.dblite
