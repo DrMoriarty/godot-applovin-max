@@ -42,30 +42,30 @@ import com.applovin.mediation.ads.MaxRewardedAd;
 public class AppLovinMax extends GodotPlugin
 {
     private final String TAG = AppLovinMax.class.getName();
-	private Activity activity = null; // The main activity of the game
+    private Activity activity = null; // The main activity of the game
 
     private HashMap<String, MaxInterstitialAd> interstitials = new HashMap<>();
     private HashMap<String, MaxAdView> banners = new HashMap<>();
     private HashMap<String, MaxRewardedAd> rewardeds = new HashMap<>();
 
-	private boolean ProductionMode = true; // Store if is real or not
+    private boolean ProductionMode = true; // Store if is real or not
 
-	private FrameLayout layout = null; // Store the layout
+    private FrameLayout layout = null; // Store the layout
     private AppLovinSdk sdk = null;
     private boolean _inited = false;
     private boolean gdprApplies;
 
-	/* Init
-	 * ********************************************************************** */
+    /* Init
+     * ********************************************************************** */
 
-	/**
-	 * Prepare for work with ApplovinMax
-	 * @param boolean ProductionMode Tell if the enviroment is for real or test
-	 * @param int gdscript instance id
-	 */
-	public void init(final String sdkKey, boolean ProductionMode) {
+    /**
+     * Prepare for work with ApplovinMax
+     * @param boolean ProductionMode Tell if the enviroment is for real or test
+     * @param int gdscript instance id
+     */
+    public void init(final String sdkKey, boolean ProductionMode) {
 
-		this.ProductionMode = ProductionMode;
+        this.ProductionMode = ProductionMode;
         layout = (FrameLayout)activity.getWindow().getDecorView().getRootView();
         sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(), activity);
         //if(!ProductionMode) sdk.getSettings().setVerboseLogging( true );
@@ -92,7 +92,7 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             } );
-	}
+    }
 
     public boolean isInited() {
         return _inited;
@@ -122,10 +122,10 @@ public class AppLovinMax extends GodotPlugin
         AppLovinPrivacySettings.setDoNotSell( ccpaApplied, activity );
     }
     
-	/* Rewarded Video
-	 * ********************************************************************** */
-	private MaxRewardedAd initRewardedVideo(final String id, final int callback_id)
-	{
+    /* Rewarded Video
+     * ********************************************************************** */
+    private MaxRewardedAd initRewardedVideo(final String id, final int callback_id)
+    {
         Log.w(TAG, "Prepare rewarded video: "+id+" callback: "+Integer.toString(callback_id));
 
         MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, sdk, activity );
@@ -182,27 +182,27 @@ public class AppLovinMax extends GodotPlugin
                 }
             });
         return rewardedAd;
-	}
+    }
 
-	/**
-	 * Load a Rewarded Video
-	 * @param String id AdMod Rewarded video ID
-	 */
-	public void loadRewardedVideo(final String id, final int callback_id) {
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Load a Rewarded Video
+     * @param String id AdMod Rewarded video ID
+     */
+    public void loadRewardedVideo(final String id, final int callback_id) {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     MaxRewardedAd rewardedAd = initRewardedVideo(id, callback_id);
                     rewardedAd.loadAd();
                     rewardeds.put(id, rewardedAd);
                 }
             });
-	}
+    }
 
-	/**
-	 * Show a Rewarded Video
-	 */
-	public void showRewardedVideo(final String id) {
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Show a Rewarded Video
+     */
+    public void showRewardedVideo(final String id) {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(rewardeds.containsKey(id)) {
                         MaxRewardedAd rewardedAd = rewardeds.get(id);
@@ -212,10 +212,10 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             });
-	}
+    }
 
-	/* Banner
-	 * ********************************************************************** */
+    /* Banner
+     * ********************************************************************** */
 
     private MaxAdView initBanner(final String id, final boolean isOnTop, final int callback_id)
     {
@@ -266,14 +266,14 @@ public class AppLovinMax extends GodotPlugin
         return adView;
     }
 
-	/**
-	 * Load a banner
-	 * @param String id AdMod Banner ID
-	 * @param boolean isOnTop To made the banner top or bottom
-	 */
-	public void loadBanner(final String id, final boolean isOnTop, final int callback_id)
-	{
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Load a banner
+     * @param String id AdMod Banner ID
+     * @param boolean isOnTop To made the banner top or bottom
+     */
+    public void loadBanner(final String id, final boolean isOnTop, final int callback_id)
+    {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(!banners.containsKey(id)) {
                         MaxAdView adView = initBanner(id, isOnTop, callback_id);
@@ -285,14 +285,14 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             });
-	}
+    }
 
-	/**
-	 * Show the banner
-	 */
-	public void showBanner(final String id)
-	{
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Show the banner
+     */
+    public void showBanner(final String id)
+    {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -311,11 +311,11 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             });
-	}
+    }
 
     public void removeBanner(final String id)
     {
-		activity.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -329,12 +329,12 @@ public class AppLovinMax extends GodotPlugin
             });
     }
 
-	/**
-	 * Hide the banner
-	 */
-	public void hideBanner(final String id)
-	{
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Hide the banner
+     */
+    public void hideBanner(final String id)
+    {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -346,14 +346,14 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             });
-	}
+    }
 
-	/**
-	 * Get the banner width
-	 * @return int Banner width
-	 */
-	public int getBannerWidth(final String id)
-	{
+    /**
+     * Get the banner width
+     * @return int Banner width
+     */
+    public int getBannerWidth(final String id)
+    {
         if(banners.containsKey(id)) {
             MaxAdView b = banners.get(id);
             if(b != null) {
@@ -364,14 +364,14 @@ public class AppLovinMax extends GodotPlugin
         } else {
             return 0;
         }
-	}
+    }
 
-	/**
-	 * Get the banner height
-	 * @return int Banner height
-	 */
-	public int getBannerHeight(final String id)
-	{
+    /**
+     * Get the banner height
+     * @return int Banner height
+     */
+    public int getBannerHeight(final String id)
+    {
         if(banners.containsKey(id)) {
             MaxAdView b = banners.get(id);
             if(b != null) {
@@ -382,10 +382,10 @@ public class AppLovinMax extends GodotPlugin
         } else {
             return 0;
         }
-	}
+    }
 
-	/* Interstitial
-	 * ********************************************************************** */
+    /* Interstitial
+     * ********************************************************************** */
     private MaxInterstitialAd initInterstitial(final String id, final int callback_id)
     {
         MaxInterstitialAd interstitial = new MaxInterstitialAd( id, sdk, activity );
@@ -423,13 +423,13 @@ public class AppLovinMax extends GodotPlugin
         return interstitial;
     }
 
-	/**
-	 * Load a interstitial
-	 * @param String id AdMod Interstitial ID
-	 */
-	public void loadInterstitial(final String id, final int callback_id)
-	{
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Load a interstitial
+     * @param String id AdMod Interstitial ID
+     */
+    public void loadInterstitial(final String id, final int callback_id)
+    {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     // Load an ad for a given zone
                     MaxInterstitialAd interstitial = initInterstitial(id, callback_id);
@@ -437,14 +437,14 @@ public class AppLovinMax extends GodotPlugin
                     interstitials.put(id, interstitial);
                 }
             });
-	}
+    }
 
-	/**
-	 * Show the interstitial
-	 */
-	public void showInterstitial(final String id)
-	{
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Show the interstitial
+     */
+    public void showInterstitial(final String id)
+    {
+        activity.runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(interstitials.containsKey(id)) {
                         MaxInterstitialAd interstitial = interstitials.get(id);
@@ -454,14 +454,14 @@ public class AppLovinMax extends GodotPlugin
                     }
                 }
             });
-	}
+    }
 
-	/* Utils
-	 * ********************************************************************** */
+    /* Utils
+     * ********************************************************************** */
 
 
-	/* Definitions
-	 * ********************************************************************** */
+    /* Definitions
+     * ********************************************************************** */
     public AppLovinMax(Godot godot) 
     {
         super(godot);
