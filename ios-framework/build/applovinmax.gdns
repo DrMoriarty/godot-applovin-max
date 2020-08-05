@@ -1,0 +1,8 @@
+[gd_resource type="NativeScript" load_steps=2 format=2]
+
+[ext_resource path="res://addons/bin/applovinmax.gdnlib" type="GDNativeLibrary" id=1]
+
+[resource]
+class_name = "AppLovinMax"
+library = ExtResource( 1 )
+script_class_name = "AppLovinMax"
