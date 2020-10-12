@@ -8,6 +8,7 @@ binary="ru.mobilap.godot:godot-applovin-max:+"
 
 local=[]
 remote=[
+  "com.applovin:applovin-sdk:9.12.7",
   "com.applovin.mediation:adcolony-adapter:+",
   "com.applovin.mediation:facebook-adapter:+",
   "com.android.support:recyclerview-v7:28.+",
