@@ -2,13 +2,13 @@
 
 name="AppLovinMax"
 binary_type="remote"
-binary="ru.mobilap.godot:godot-applovin-max:+"
+binary="ru.mobilap.godot:godot-applovin-max:0.0.3"
 
 [dependencies]
 
 local=[]
 remote=[
-  "com.applovin:applovin-sdk:9.12.7",
+  "com.applovin:applovin-sdk:9.14.6",
   "com.applovin.mediation:adcolony-adapter:+",
   "com.applovin.mediation:facebook-adapter:+",
   "com.android.support:recyclerview-v7:28.+",

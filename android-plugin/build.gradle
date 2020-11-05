@@ -48,11 +48,11 @@ dependencies {
      library when building the final binary.
      */
     compileOnly fileTree(dir: 'libs', include: ['godot-lib*.aar'])
-    implementation 'com.applovin:applovin-sdk:9.12.7'
+    implementation 'com.applovin:applovin-sdk:9.14.6'
 }
 
 group = 'ru.mobilap.godot'
-version = '0.0.2'
+version = '0.0.3'
 ext {
     artifact = 'godot-applovin-max'
 }

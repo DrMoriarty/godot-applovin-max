@@ -35,6 +35,7 @@ import com.applovin.mediation.MaxAdListener;
 import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.MaxAdViewAdListener;
 import com.applovin.mediation.MaxReward;
+import com.applovin.mediation.MaxAdFormat;
 import com.applovin.mediation.ads.MaxAdView;
 import com.applovin.mediation.ads.MaxInterstitialAd;
 import com.applovin.mediation.ads.MaxRewardedAd;
@@ -46,6 +47,7 @@ public class AppLovinMax extends GodotPlugin
 
     private HashMap<String, MaxInterstitialAd> interstitials = new HashMap<>();
     private HashMap<String, MaxAdView> banners = new HashMap<>();
+    private HashMap<String, MaxAdView> mrecs = new HashMap<>();
     private HashMap<String, MaxRewardedAd> rewardeds = new HashMap<>();
 
     private boolean ProductionMode = true; // Store if is real or not
@@ -384,6 +386,110 @@ public class AppLovinMax extends GodotPlugin
         }
     }
 
+    /* MREC
+     * ********************************************************************** */
+
+    private MaxAdView initMREC(final String id, final int gravity, final int callback_id)
+    {
+
+        // Create an ad view with a specific zone to load ads for
+        MaxAdView adView = new MaxAdView( id, MaxAdFormat.MREC, sdk, activity );
+
+        // Optional: Set listeners
+        adView.setListener( new MaxAdViewAdListener() {
+                @Override
+                public void onAdLoaded(final MaxAd maxAd) {
+                    Log.w(TAG, "MREC: onAdLoaded");
+                    GodotLib.calldeferred(callback_id, "_on_mrec_loaded", new Object[]{ id });
+                }
+                @Override
+                public void onAdLoadFailed(final String adUnitId, final int errorCode) {
+                    Log.w(TAG, "MREC: onAdLoadFailed");
+                    GodotLib.calldeferred(callback_id, "_on_mrec_failed_to_load", new Object[]{ id, ""+errorCode });
+                }
+                @Override
+                public void onAdHidden(final MaxAd maxAd) {
+                }
+                @Override
+                public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
+                }
+                @Override
+                public void onAdDisplayed(final MaxAd maxAd) {
+                }
+                @Override
+                public void onAdClicked(final MaxAd maxAd) {
+                }
+                @Override
+                public void onAdExpanded(final MaxAd maxAd) {
+                }
+                @Override
+                public void onAdCollapsed(final MaxAd maxAd) {
+                }
+            });
+
+        FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(AppLovinSdkUtils.dpToPx(activity, 300), AppLovinSdkUtils.dpToPx(activity, 250));
+        adParams.gravity = gravity;
+        adView.setBackgroundColor(/* Color.WHITE */Color.TRANSPARENT);
+        layout.addView(adView, adParams);
+        return adView;
+    }
+
+    /**
+     * Load a banner
+     * @param String id AdMod Banner ID
+     * @param boolean isOnTop To made the banner top or bottom
+     */
+    public void loadMREC(final String id, final int gravity, final int callback_id)
+    {
+        activity.runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    if(!mrecs.containsKey(id)) {
+                        MaxAdView adView = initMREC(id, gravity, callback_id);
+                        adView.loadAd();
+                        mrecs.put(id, adView);
+                    } else {
+                        MaxAdView adView = mrecs.get(id);
+                        adView.loadAd();
+                    }
+                }
+            });
+    }
+
+    /**
+     * Show the banner
+     */
+    public void showMREC(final String id)
+    {
+        activity.runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    if(mrecs.containsKey(id)) {
+                        MaxAdView b = mrecs.get(id);
+                        b.setVisibility(View.VISIBLE);
+                        b.startAutoRefresh();
+                        Log.d(TAG, "Show MREC");
+                    } else {
+                        Log.w(TAG, "MREC not found: "+id);
+                    }
+                }
+            });
+    }
+
+    public void removeMREC(final String id)
+    {
+        activity.runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    if(mrecs.containsKey(id)) {
+                        MaxAdView b = mrecs.get(id);
+                        mrecs.remove(id);
+                        layout.removeView(b); // Remove the MREC
+                        Log.d(TAG, "Remove MREC");
+                    } else {
+                        Log.w(TAG, "MREC not found: "+id);
+                    }
+                }
+            });
+    }
+
     /* Interstitial
      * ********************************************************************** */
     private MaxInterstitialAd initInterstitial(final String id, final int callback_id)
@@ -482,7 +588,9 @@ public class AppLovinMax extends GodotPlugin
                 // Interstitial
                 "loadInterstitial", "showInterstitial",
                 // Rewarded video
-                "loadRewardedVideo", "showRewardedVideo"
+                "loadRewardedVideo", "showRewardedVideo",
+                // MREC
+                "loadMREC", "showMREC", "removeMREC"
         );
     }
 
