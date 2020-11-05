@@ -2,7 +2,7 @@
 
 name="AppLovinMax"
 binary_type="remote"
-binary="ru.mobilap.godot:godot-applovin-max:0.0.3"
+binary="ru.mobilap.godot:godot-applovin-max:0.0.4"
 
 [dependencies]
 

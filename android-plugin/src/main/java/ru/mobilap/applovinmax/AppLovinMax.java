@@ -49,6 +49,7 @@ public class AppLovinMax extends GodotPlugin
     private HashMap<String, MaxAdView> banners = new HashMap<>();
     private HashMap<String, MaxAdView> mrecs = new HashMap<>();
     private HashMap<String, MaxRewardedAd> rewardeds = new HashMap<>();
+    private HashMap<String, FrameLayout.LayoutParams> layoutParams = new HashMap<>();
 
     private boolean ProductionMode = true; // Store if is real or not
 
@@ -430,7 +431,7 @@ public class AppLovinMax extends GodotPlugin
         FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(AppLovinSdkUtils.dpToPx(activity, 300), AppLovinSdkUtils.dpToPx(activity, 250));
         adParams.gravity = gravity;
         adView.setBackgroundColor(/* Color.WHITE */Color.TRANSPARENT);
-        layout.addView(adView, adParams);
+        layoutParams.put(id, adParams);
         return adView;
     }
 
@@ -464,6 +465,8 @@ public class AppLovinMax extends GodotPlugin
                 @Override public void run() {
                     if(mrecs.containsKey(id)) {
                         MaxAdView b = mrecs.get(id);
+                        FrameLayout.LayoutParams adParams = layoutParams.get(id);
+                        layout.addView(b, adParams);
                         b.setVisibility(View.VISIBLE);
                         b.startAutoRefresh();
                         Log.d(TAG, "Show MREC");
