@@ -1,7 +1,7 @@
 #!/bin/bash
 
-rm -rf "./build/*.xcframework"
-rm -rf "./build/*.xcarchive"
+rm -rf ./build/*.xcframework
+rm -rf ./build/*.xcarchive
 
 PROJECT=${1:-gdnative_ios.xcodeproj}
 SCHEME=${2:-library}

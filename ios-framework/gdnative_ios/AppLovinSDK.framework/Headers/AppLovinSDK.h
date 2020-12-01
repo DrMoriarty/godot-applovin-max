@@ -29,6 +29,7 @@
 #import <AppLovinSDK/ALSdkConfiguration.h>
 #import <AppLovinSDK/ALSdkSettings.h>
 #import <AppLovinSDK/ALUserService.h>
+#import <AppLovinSDK/ALUserSegment.h>
 #import <AppLovinSDK/ALNativeAd.h>
 #import <AppLovinSDK/ALNativeAdLoadDelegate.h>
 #import <AppLovinSDK/ALNativeAdPrecacheDelegate.h>

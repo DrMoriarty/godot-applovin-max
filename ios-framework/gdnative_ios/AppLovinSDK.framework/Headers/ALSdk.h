@@ -17,6 +17,7 @@
 #import "ALSdkConfiguration.h"
 #import "ALErrorCodes.h"
 #import "ALMediationProvider.h"
+#import "ALUserSegment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This is a base class for the AppLovin iOS SDK.
  */
 @interface ALSdk : NSObject
+
 
 #pragma mark - High Level SDK Properties
 
@@ -64,20 +66,26 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSString *mediationProvider;
 
+/**
+ * Set an identifier for the current user. This identifier will be tied to SDK events and our optional S2S postbacks.
+ *
+ * If you're using reward validation, you can optionally set an identifier to be included with currency validation postbacks.
+ * For example, a username or email. We'll include this in the postback when we ping your currency endpoint from our server.
+ */
+@property (nonatomic, copy, nullable) NSString *userIdentifier;
+
+/**
+ * User segments allow us to serve ads using custom-defined rules based on which segment the user is in. For now, we only support a custom string 32 alphanumeric characters or less as the user segment.
+ */
+@property (nonatomic, strong, readonly) ALUserSegment *userSegment;
+
+
 #pragma mark - SDK Services
 
 /**
  * This service is used to load and display ads from AppLovin servers.
  */
 @property (nonatomic, strong, readonly) ALAdService *adService;
-
-/**
- * Get an instance of AppLovin Native Ad service. This service is
- * used to fetch and display native ads from AppLovin servers.
- *
- * @return Native ad service. Guaranteed not to be null.
- */
-@property (nonatomic, strong, readonly) ALNativeAdService *nativeAdService;
 
 /**
  * Get an instance of the AppLovin postback service. This service is used to dispatch HTTP GET postbacks to arbitrary URLs.
@@ -108,20 +116,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) ALVariableService *variableService;
 
 /**
- * Set an identifier for the current user. This identifier will be tied to SDK events and our optional S2S postbacks.
- *
- * If you're using reward validation, you can optionally set an identifier to be included with currency validation postbacks.
- * For example, a username or email. We'll include this in the postback when we ping your currency endpoint from our server.
- */
-@property (nonatomic, copy, nullable) NSString *userIdentifier;
-
-/**
  * Present the mediation debugger UI.
  * This debugger tool provides the status of your integration for each third-party ad network.
  *
  * Please call this method after the SDK has initialized, e.g. in the completionHandler of -[ALSdk initializeSdkWithCompletionHandler:].
  */
 - (void)showMediationDebugger;
+
 
 #pragma mark - SDK Initialization
 
@@ -200,6 +201,10 @@ typedef void (^ALSdkInitializationCompletionHandler)(ALSdkConfiguration *configu
 - (instancetype)init __attribute__((unavailable("Use +[ALSdk shared], +[ALSdk sharedWithKey:], or +[ALSdk sharedWithKey:settings:].")));
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+@interface ALSdk(ALDeprecated)
+@property (nonatomic, strong, readonly) ALNativeAdService *nativeAdService __deprecated_msg("Native ads have been deprecated and will be removed in a future SDK version.");
 @end
 
 NS_ASSUME_NONNULL_END

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5128757A25767432006D5DA6 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5128757925767424006D5DA6 /* libz.tbd */; };
 		51510E9924D949E4002FDD7F /* AppLovinSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51510E9824D949E4002FDD7F /* AppLovinSDK.framework */; };
 		51510EA024D94A3B002FDD7F /* AppLovinMax.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 51510E9E24D94A3A002FDD7F /* AppLovinMax.hpp */; };
 		51510EA124D94A3B002FDD7F /* AppLovinMax.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51510E9F24D94A3A002FDD7F /* AppLovinMax.mm */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5128757925767424006D5DA6 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		51510E9824D949E4002FDD7F /* AppLovinSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppLovinSDK.framework; path = gdnative_ios/AppLovinSDK.framework; sourceTree = "<group>"; };
 		51510E9E24D94A3A002FDD7F /* AppLovinMax.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AppLovinMax.hpp; sourceTree = "<group>"; };
 		51510E9F24D94A3A002FDD7F /* AppLovinMax.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppLovinMax.mm; sourceTree = "<group>"; };
@@ -38,6 +40,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				51510E9924D949E4002FDD7F /* AppLovinSDK.framework in Frameworks */,
+				5128757A25767432006D5DA6 /* libz.tbd in Frameworks */,
 				51E8DE9A24D83FF200CB0940 /* libgodot-cpp.ios.release.a in Frameworks */,
 				51510EA324D96381002FDD7F /* AudioToolbox.framework in Frameworks */,
 			);
@@ -87,6 +90,7 @@
 		90A13CF424AB37D900E8464F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5128757925767424006D5DA6 /* libz.tbd */,
 				51510EA224D96381002FDD7F /* AudioToolbox.framework */,
 				51510E9824D949E4002FDD7F /* AppLovinSDK.framework */,
 				51B4368D24D870EE0040DBF7 /* UIKit.framework */,

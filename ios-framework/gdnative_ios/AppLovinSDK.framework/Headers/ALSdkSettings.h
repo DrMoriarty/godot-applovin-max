@@ -43,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy) NSArray<NSString *> *initializationAdUnitIdentifiers;
 
+/**
+ * Whether or not the AppLovin SDK listens to exceptions. Defaults to YES.
+ */
+@property (nonatomic, assign, getter=isExceptionHandlerEnabled) BOOL exceptionHandlerEnabled;
+
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
