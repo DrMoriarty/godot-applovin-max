@@ -187,6 +187,16 @@ static ALSdk *sdk = nil;
         _onTop = isOnTop;
         _banner = [[MAAdView alloc] initWithAdUnitIdentifier:idStr sdk:sdk];
         _banner.delegate = self;
+        CGRect fr = UIApplication.sharedApplication.keyWindow.rootViewController.view.frame;
+        if(isOnTop) {
+            fr.origin = CGPointZero;
+            fr.size.height = fr.size.width > 320 ? 90 : 50;
+        } else {
+            CGFloat H = fr.size.height;
+            fr.size.height = fr.size.width > 320 ? 90 : 50;
+            fr.origin = CGPointMake(0, H - fr.size.height);
+        }
+        _banner.frame = fr;
         [_banner loadAd];
     }
     return self;
