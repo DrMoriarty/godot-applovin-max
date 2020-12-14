@@ -265,7 +265,7 @@ public class AppLovinMax extends GodotPlugin
         if(isOnTop) adParams.gravity = Gravity.TOP;
         else adParams.gravity = Gravity.BOTTOM;
         adView.setBackgroundColor(/* Color.WHITE */Color.TRANSPARENT);
-        layout.addView(adView, adParams);
+        layoutParams.put(id, adParams);
         return adView;
     }
 
@@ -299,6 +299,12 @@ public class AppLovinMax extends GodotPlugin
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
+                        if(b.getParent() != null) {
+                            Log.w(TAG, "Banner already shown: "+id);
+                            return;
+                        }
+                        FrameLayout.LayoutParams adParams = layoutParams.get(id);
+                        layout.addView(b, adParams);
                         b.setVisibility(View.VISIBLE);
                         b.startAutoRefresh();
                         for (String key : banners.keySet()) {
@@ -360,8 +366,14 @@ public class AppLovinMax extends GodotPlugin
         if(banners.containsKey(id)) {
             MaxAdView b = banners.get(id);
             if(b != null) {
-                Resources r = activity.getResources();
-                return (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, b.getWidth(), r.getDisplayMetrics());
+                int w = b.getWidth();
+                /*
+                if(w == 0) {
+                    Resources r = activity.getResources();
+                    w = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, b.getSize().width, r.getDisplayMetrics());
+                }
+                */
+                return w;
             } else
                 return 0;
         } else {
@@ -378,8 +390,14 @@ public class AppLovinMax extends GodotPlugin
         if(banners.containsKey(id)) {
             MaxAdView b = banners.get(id);
             if(b != null) {
-                Resources r = activity.getResources();
-                return (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, b.getHeight(), r.getDisplayMetrics());
+                int h = b.getHeight();
+                /*
+                if (h == 0) {
+                    Resources r = activity.getResources();
+                    h = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, b.getSize().height, r.getDisplayMetrics());
+                }
+                */
+                return h;
             } else
                 return 0;
         } else {
