@@ -188,12 +188,13 @@ static ALSdk *sdk = nil;
         _banner = [[MAAdView alloc] initWithAdUnitIdentifier:idStr sdk:sdk];
         _banner.delegate = self;
         CGRect fr = UIApplication.sharedApplication.keyWindow.rootViewController.view.frame;
+        BOOL isIPAD = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
         if(isOnTop) {
             fr.origin = CGPointZero;
-            fr.size.height = fr.size.width > 320 ? 90 : 50;
+            fr.size.height = isIPAD ? 90 : 50;
         } else {
             CGFloat H = fr.size.height;
-            fr.size.height = fr.size.width > 320 ? 90 : 50;
+            fr.size.height = isIPAD ? 90 : 50;
             fr.origin = CGPointMake(0, H - fr.size.height);
         }
         _banner.frame = fr;
@@ -349,13 +350,13 @@ void AppLovinMax::resize() {
 int AppLovinMax::getBannerWidth(const String bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
-    return wrapper.banner.frame.size.width;
+    return wrapper.banner.frame.size.width * UIScreen.mainScreen.scale;
 }
 
 int AppLovinMax::getBannerHeight(const String bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
-    return wrapper.banner.frame.size.height;
+    return wrapper.banner.frame.size.height * UIScreen.mainScreen.scale;
 }
 
 void AppLovinMax::loadInterstitial(const String interstitialId, Object *callbackOb) {

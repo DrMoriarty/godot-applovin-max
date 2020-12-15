@@ -243,9 +243,13 @@ public class AppLovinMax extends GodotPlugin
                 }
                 @Override
                 public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
+                    Log.w(TAG, "Banner: onAdDisplayFailed");
+                    GodotLib.calldeferred(callback_id, "_on_banner_failed_to_load", new Object[]{ id, ""+errorCode });
                 }
                 @Override
                 public void onAdDisplayed(final MaxAd maxAd) {
+                    Log.w(TAG, "Banner: onAdDisplayed");
+                    GodotLib.calldeferred(callback_id, "_on_banner_shown", new Object[]{ id });
                 }
                 @Override
                 public void onAdClicked(final MaxAd maxAd) {
