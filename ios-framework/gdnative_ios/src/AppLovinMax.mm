@@ -8,6 +8,7 @@ using namespace godot;
 #define BANNER_ENABLE_DELAY 5
  
 static NSMutableDictionary *banners = nil;
+static NSMutableDictionary *mrecs = nil;
 static NSMutableDictionary *interstitials = nil;
 static NSMutableDictionary *rewardeds = nil;
 static NSString *lastBannerId = nil;
@@ -250,9 +251,108 @@ static ALSdk *sdk = nil;
 @end
 
 
+@interface MRECWrapper: NSObject<MAAdViewAdDelegate>
+@property (nonatomic, readonly) Object* cbOb;
+@property (nonatomic, strong) MAAdView* banner;
+@property (nonatomic, readonly) int gravity;
+@end
+
+@implementation MRECWrapper
+- (instancetype)initWithAdUnitId:(NSString*)idStr andCallbackOb:(Object*)callbackOb gravity:(int)gravity {
+    if((self = [super init])) {
+        _cbOb = callbackOb;
+        _gravity = gravity;
+        _banner = [[MAAdView alloc] initWithAdUnitIdentifier:idStr adFormat:MAAdFormat.mrec sdk:sdk];
+        _banner.delegate = self;
+        CGRect wfr = UIApplication.sharedApplication.keyWindow.rootViewController.view.frame;
+        CGRect bfr = CGRectMake(0, 0, 300, 250);
+        /* Gravity
+           x50 - bottom
+           x30 - top
+           x10 - vcenter
+           x05 - right
+           x03 - left
+           x01 - hcenter
+           x00 - no gravity
+         */
+        switch(gravity & 0x07) {
+        default:
+        case 0:
+            break;
+        case 1:
+            bfr.origin.x = (wfr.size.width - bfr.size.width) / 2; break;
+        case 3:
+            bfr.origin.x = 0; break;
+        case 5:
+            bfr.origin.x = wfr.size.width - bfr.size.width; break;
+        }
+        switch(gravity & 0x70) {
+        default:
+        case 0:
+            break;
+        case 0x10:
+            bfr.origin.y = (wfr.size.height - bfr.size.height) / 2; break;
+        case 0x30:
+            bfr.origin.y = 0; break;
+        case 0x50:
+            bfr.origin.y = wfr.size.height - bfr.size.height; break;
+        }
+        _banner.frame = bfr;
+        [_banner loadAd];
+    }
+    return self;
+}
+
+- (void)didLoadAd:(MAAd *)ad
+{
+    NSLog(@"MAX: MREC loaded %@", ad.adUnitIdentifier);
+    Array args = Array();
+    args.append(String(ad.adUnitIdentifier.UTF8String));
+    _cbOb->call_deferred("_on_mrec_loaded", args);
+}
+
+- (void)didFailToLoadAdForAdUnitIdentifier:(NSString *)adUnitIdentifier withErrorCode:(NSInteger)errorCode
+{
+    NSLog(@"MAX: MREC loading failed %@", adUnitIdentifier);
+    NSString *err = [NSString stringWithFormat:@"%d", (int)errorCode];
+    Array args = Array();
+    args.append(String(adUnitIdentifier.UTF8String));
+    args.append(String(err.UTF8String));
+    _cbOb->call_deferred("_on_mrec_failed_to_load", args);
+}
+
+- (void)didDisplayAd:(MAAd *)ad
+{
+    NSLog(@"MAX: MREC display ad %@", ad.adUnitIdentifier);
+}
+
+- (void)didHideAd:(MAAd *)ad
+{
+    NSLog(@"MAX: MREC hide ad %@", ad.adUnitIdentifier);
+}
+
+- (void)didClickAd:(MAAd *)ad
+{
+    NSLog(@"MAX: MREC click ad %@", ad.adUnitIdentifier);
+}
+
+- (void)didFailToDisplayAd:(MAAd *)ad withErrorCode:(NSInteger)errorCode
+{
+    NSLog(@"MAX: MREC display failed %@", ad.adUnitIdentifier);
+    NSString *err = [NSString stringWithFormat:@"%d", (int)errorCode];
+    Array args = Array();
+    args.append(String(ad.adUnitIdentifier.UTF8String));
+    args.append(String(err.UTF8String));
+    _cbOb->call_deferred("_on_mrec_failed_to_load", args);
+}
+- (void)didExpandAd:(MAAd *)ad {}
+- (void)didCollapseAd:(MAAd *)ad {}
+@end
+
 
 AppLovinMax::AppLovinMax() {
     banners = [NSMutableDictionary new];
+    mrecs = [NSMutableDictionary new];
     interstitials = [NSMutableDictionary new];
     rewardeds = [NSMutableDictionary new];
     inited = false;
@@ -264,7 +364,7 @@ AppLovinMax::~AppLovinMax() {
 void AppLovinMax::_init() {
 }
 
-void AppLovinMax::init(const String sdk_key, bool ProductionMode) {
+void AppLovinMax::init(const String& sdk_key, bool ProductionMode) {
     NSString *key = [NSString stringWithCString:sdk_key.utf8().get_data() encoding: NSUTF8StringEncoding];
     productionMode = ProductionMode;
     sdk = [ALSdk sharedWithKey:key];
@@ -289,7 +389,7 @@ bool AppLovinMax::isInited() {
     return inited;
 }
 
-void AppLovinMax::setUserId(const String user_id) {
+void AppLovinMax::setUserId(const String& user_id) {
     NSString *uid = [NSString stringWithCString:user_id.utf8().get_data() encoding: NSUTF8StringEncoding];
     [sdk setUserIdentifier:uid];
 }
@@ -314,13 +414,13 @@ void AppLovinMax::setCCPAApplied(bool ccpa_applied) {
     [ALPrivacySettings setDoNotSell:ccpa_applied];
 }
 
-void AppLovinMax::loadBanner(const String bannerId, bool isOnTop, Object *callbackOb) {
+void AppLovinMax::loadBanner(const String& bannerId, bool isOnTop, Object *callbackOb) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper *wrapper = [[BannerWrapper alloc] initWithAdUnitId:idStr andCallbackOb:callbackOb top:isOnTop];
     [banners setObject:wrapper forKey:idStr];
 }
 
-void AppLovinMax::showBanner(const String bannerId) {
+void AppLovinMax::showBanner(const String& bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
     UIViewController *root = UIApplication.sharedApplication.keyWindow.rootViewController;
@@ -329,14 +429,14 @@ void AppLovinMax::showBanner(const String bannerId) {
     bannerShown = true;
 }
 
-void AppLovinMax::hideBanner(const String bannerId) {
+void AppLovinMax::hideBanner(const String& bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
     wrapper.banner.hidden = YES;
     bannerShown = false;
 }
 
-void AppLovinMax::removeBanner(const String bannerId) {
+void AppLovinMax::removeBanner(const String& bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
     [wrapper.banner removeFromSuperview];
@@ -347,40 +447,61 @@ void AppLovinMax::resize() {
     //[banner resize];
 }
 
-int AppLovinMax::getBannerWidth(const String bannerId) {
+int AppLovinMax::getBannerWidth(const String& bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
     return wrapper.banner.frame.size.width * UIScreen.mainScreen.scale;
 }
 
-int AppLovinMax::getBannerHeight(const String bannerId) {
+int AppLovinMax::getBannerHeight(const String& bannerId) {
     NSString *idStr = [NSString stringWithCString:bannerId.utf8().get_data() encoding: NSUTF8StringEncoding];
     BannerWrapper * wrapper = [banners objectForKey:idStr];
     return wrapper.banner.frame.size.height * UIScreen.mainScreen.scale;
 }
 
-void AppLovinMax::loadInterstitial(const String interstitialId, Object *callbackOb) {
+void AppLovinMax::loadInterstitial(const String& interstitialId, Object *callbackOb) {
     NSString *idStr = [NSString stringWithCString:interstitialId.utf8().get_data() encoding: NSUTF8StringEncoding];
     InterstitialWrapper *wrapper = [[InterstitialWrapper alloc] initWithAdUnitId:idStr andCallbackOb:callbackOb];
     [interstitials setObject:wrapper forKey:idStr];
 }
 
-void AppLovinMax::showInterstitial(const String interstitialId) {    
+void AppLovinMax::showInterstitial(const String& interstitialId) {    
     NSString *idStr = [NSString stringWithCString:interstitialId.utf8().get_data() encoding: NSUTF8StringEncoding];
     InterstitialWrapper * wrapper = [interstitials objectForKey:idStr];
     [wrapper.interstitial showAd];
 }
 
-void AppLovinMax::loadRewardedVideo(const String rewardedId, Object *callbackOb) {
+void AppLovinMax::loadRewardedVideo(const String& rewardedId, Object *callbackOb) {
     NSString *idStr = [NSString stringWithCString:rewardedId.utf8().get_data() encoding: NSUTF8StringEncoding];
     RewardedWrapper *wrapper = [[RewardedWrapper alloc] initWithAdUnitId:idStr andCallbackOb:callbackOb];
     [rewardeds setObject:wrapper forKey:idStr];
 }
 
-void AppLovinMax::showRewardedVideo(const String rewardedId) {
+void AppLovinMax::showRewardedVideo(const String& rewardedId) {
     NSString *idStr = [NSString stringWithCString:rewardedId.utf8().get_data() encoding: NSUTF8StringEncoding];
     RewardedWrapper * wrapper = [rewardeds objectForKey:idStr];
     [wrapper.rewarded showAd];
+}
+
+void AppLovinMax::loadMREC(const godot::String& mrecId, int gravity, Object *callbackOb) {
+    NSString *idStr = [NSString stringWithCString:mrecId.utf8().get_data() encoding:NSUTF8StringEncoding];
+    MRECWrapper *wrapper = [[MRECWrapper alloc] initWithAdUnitId:idStr andCallbackOb:callbackOb gravity:gravity];
+    [mrecs setObject:wrapper forKey:idStr];
+}
+
+void AppLovinMax::showMREC(const godot::String& mrecId) {
+    NSString *idStr = [NSString stringWithCString:mrecId.utf8().get_data() encoding:NSUTF8StringEncoding];
+    MRECWrapper * wrapper = [mrecs objectForKey:idStr];
+    UIViewController *root = UIApplication.sharedApplication.keyWindow.rootViewController;
+    [root.view addSubview:wrapper.banner];
+    wrapper.banner.hidden = NO;
+}
+
+void AppLovinMax::removeMREC(const godot::String& mrecId) {
+    NSString *idStr = [NSString stringWithCString:mrecId.utf8().get_data() encoding: NSUTF8StringEncoding];
+    MRECWrapper * wrapper = [mrecs objectForKey:idStr];
+    [wrapper.banner removeFromSuperview];
+    [mrecs removeObjectForKey:idStr];
 }
 
 void AppLovinMax::_register_methods() {
@@ -403,4 +524,7 @@ void AppLovinMax::_register_methods() {
     register_method("resize",&AppLovinMax::resize);
     register_method("getBannerWidth",&AppLovinMax::getBannerWidth);
     register_method("getBannerHeight",&AppLovinMax::getBannerHeight);
+    register_method("loadMREC", &AppLovinMax::loadMREC);
+    register_method("showMREC", &AppLovinMax::showMREC);
+    register_method("removeMREC", &AppLovinMax::removeMREC);
 }
