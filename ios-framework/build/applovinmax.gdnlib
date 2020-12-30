@@ -7,8 +7,8 @@ reloadable=false
 
 [entry]
 
-iOS.armv7="res://addons/bin/applovin-max.xcframework"
-iOS.arm64="res://addons/bin/applovin-max.xcframework"
+iOS.armv7="res://addons/applovinmax-ios/applovin-max.xcframework"
+iOS.arm64="res://addons/applovinmax-ios/applovin-max.xcframework"
 
 [dependencies]
 

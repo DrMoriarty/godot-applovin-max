@@ -1,0 +1,38 @@
+{
+  "name": "applovinmax",
+  "description": "AppLovin-Max plugin. Ad mediation and header-bidding solution.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "url": "https://github.com/DrMoriarty/godot-applovinmax.git",
+  "dependencies": [
+  ],
+  "files": {
+    "scripts": "scripts"
+  },
+  "variables": {
+    "AppLovin/SdkKey": {
+      "info": "Set your SDK key here"
+    }
+  },
+  "autoload": {
+    "applovin_max": "*res://scripts/applovin_max.gd"
+  },
+  "platform_ios": {
+    "dependencies": [
+      "nativelib-export"
+    ],
+    "files": {
+      "ios-framework/build/applovinmax.gdnlib": "addons/applovinmax-ios/",
+      "ios-framework/build/applovinmax.gdns": "addons/applovinmax-ios/",
+      "ios-framework/build/.gitignore": "addons/applovinmax-ios/",
+      "ios-framework/build/applovin-max.xcframework": "addons/applovinmax-ios/applovin-max.xcframework",
+      "nativelib-export": "addons/nativelib-export"
+    }
+  },
+  "platform_android": {
+    "files": {
+      "android-plugin/AppLovinMax.gdap": "android/plugins/",
+      "android-plugin/build/outputs/aar/AppLovinMax.release.aar": "android/plugins/"
+    }
+  }
+}

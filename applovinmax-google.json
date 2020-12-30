@@ -1,0 +1,21 @@
+{
+  "name": "applovinmax-google",
+  "description": "Google (AdMob) adapter for AppLovin-Max plugin.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "url": "https://github.com/DrMoriarty/godot-applovinmax.git",
+  "dependencies": [
+    "applovinmax"
+  ],
+  "platform_ios": {
+    "files": {
+      "ios-framework/adapters/AppLovinMediationGoogleAdapter.framework": "addons/nativelib-export/iOS/AppLovinMediationGoogleAdapter.framework",
+      "ios-framework/adapters/google": "addons/nativelib-export/iOS"
+    }
+  },
+  "platform_android": {
+    "files": {
+      "android-plugin/AppLovinMax-Google.gdap": "android/plugins/"
+    }
+  }
+}

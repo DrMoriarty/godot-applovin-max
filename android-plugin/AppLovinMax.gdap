@@ -1,0 +1,19 @@
+[config]
+
+name="AppLovinMax"
+binary_type="local"
+binary="AppLovinMax.release.aar"
+
+[dependencies]
+
+local=[]
+remote=[
+  "com.applovin:applovin-sdk:9.14.6",
+  "com.android.support:recyclerview-v7:28.+",
+  "com.android.support:appcompat-v7:28.+",
+  "com.squareup.picasso:picasso:2.5.2",
+  "com.android.support:customtabs:28.+"
+]
+custom_maven_repos=[
+  "https://applovin.bintray.com/Android-Adapter-SDKs",
+]
