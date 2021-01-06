@@ -20,6 +20,10 @@
 
 4. Enable **Custom Build** for using in Android.
 
+## Adapters
+
+The core module has only SDK for Applovin network. For using additional networks you should install specific adapters. For example install `applovinmax-facebook` for Facebook Audience Network. 
+
 ## Usage
 
 Wrapper on gd-script will be in your autoloading list. Use global name `applovin_max` anywhere in your code to use API.
