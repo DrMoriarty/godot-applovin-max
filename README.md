@@ -1,5 +1,7 @@
 # AppLovin-Max plugin for godot engine.
 
+You should have AppLovinMAX account in order to use this module https://www.applovin.com/max/
+
 ## Installation using NativeLib Addon
 
 1. Add [NativeLib Addon](https://github.com/DrMoriarty/nativelib) into your project (search it in Godot's AssetLib).
