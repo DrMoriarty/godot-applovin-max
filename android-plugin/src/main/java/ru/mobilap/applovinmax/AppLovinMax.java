@@ -43,7 +43,6 @@ import com.applovin.mediation.ads.MaxRewardedAd;
 public class AppLovinMax extends GodotPlugin
 {
     private final String TAG = AppLovinMax.class.getName();
-    private Activity activity = null; // The main activity of the game
 
     private HashMap<String, MaxInterstitialAd> interstitials = new HashMap<>();
     private HashMap<String, MaxAdView> banners = new HashMap<>();
@@ -69,8 +68,8 @@ public class AppLovinMax extends GodotPlugin
     public void init(final String sdkKey, boolean ProductionMode) {
 
         this.ProductionMode = ProductionMode;
-        layout = (FrameLayout)activity.getWindow().getDecorView().getRootView();
-        sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(), activity);
+        layout = (FrameLayout)getActivity().getWindow().getDecorView().getRootView();
+        sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(), getActivity());
         //if(!ProductionMode) sdk.getSettings().setVerboseLogging( true );
         sdk.setMediationProvider( AppLovinMediationProvider.MAX );
         sdk.initializeSdk(new AppLovinSdk.SdkInitializationListener() {
@@ -114,15 +113,15 @@ public class AppLovinMax extends GodotPlugin
     }
 
     public void setGdprConsent(final boolean consent) {
-        AppLovinPrivacySettings.setHasUserConsent( consent, activity );
+        AppLovinPrivacySettings.setHasUserConsent( consent, getActivity() );
     }
 
     public void setAgeRestricted(final boolean ageRestricted) {
-        AppLovinPrivacySettings.setIsAgeRestrictedUser( ageRestricted, activity );
+        AppLovinPrivacySettings.setIsAgeRestrictedUser( ageRestricted, getActivity() );
     }
 
     public void setCCPAApplied(final boolean ccpaApplied) {
-        AppLovinPrivacySettings.setDoNotSell( ccpaApplied, activity );
+        AppLovinPrivacySettings.setDoNotSell( ccpaApplied, getActivity() );
     }
     
     /* Rewarded Video
@@ -131,7 +130,7 @@ public class AppLovinMax extends GodotPlugin
     {
         Log.w(TAG, "Prepare rewarded video: "+id+" callback: "+Integer.toString(callback_id));
 
-        MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, sdk, activity );
+        MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, sdk, getActivity() );
         rewardedAd.setListener(new MaxRewardedAdListener() {
                 @Override
                 public void onAdLoaded(final MaxAd maxAd) {
@@ -192,7 +191,7 @@ public class AppLovinMax extends GodotPlugin
      * @param String id AdMod Rewarded video ID
      */
     public void loadRewardedVideo(final String id, final int callback_id) {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     MaxRewardedAd rewardedAd = initRewardedVideo(id, callback_id);
                     rewardedAd.loadAd();
@@ -205,7 +204,7 @@ public class AppLovinMax extends GodotPlugin
      * Show a Rewarded Video
      */
     public void showRewardedVideo(final String id) {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(rewardeds.containsKey(id)) {
                         MaxRewardedAd rewardedAd = rewardeds.get(id);
@@ -224,7 +223,7 @@ public class AppLovinMax extends GodotPlugin
     {
 
         // Create an ad view with a specific zone to load ads for
-        MaxAdView adView = new MaxAdView( id, sdk, activity );
+        MaxAdView adView = new MaxAdView( id, sdk, getActivity() );
 
         // Optional: Set listeners
         adView.setListener( new MaxAdViewAdListener() {
@@ -264,7 +263,7 @@ public class AppLovinMax extends GodotPlugin
 
         FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
                                                                          FrameLayout.LayoutParams.MATCH_PARENT,
-                                                                         AppLovinSdkUtils.dpToPx( activity, 50 )
+                                                                         AppLovinSdkUtils.dpToPx( getActivity(), 50 )
                                                                          );
         if(isOnTop) adParams.gravity = Gravity.TOP;
         else adParams.gravity = Gravity.BOTTOM;
@@ -280,7 +279,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void loadBanner(final String id, final boolean isOnTop, final int callback_id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(!banners.containsKey(id)) {
                         MaxAdView adView = initBanner(id, isOnTop, callback_id);
@@ -299,7 +298,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void showBanner(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -328,7 +327,7 @@ public class AppLovinMax extends GodotPlugin
 
     public void removeBanner(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -347,7 +346,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void hideBanner(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(banners.containsKey(id)) {
                         MaxAdView b = banners.get(id);
@@ -416,7 +415,7 @@ public class AppLovinMax extends GodotPlugin
     {
 
         // Create an ad view with a specific zone to load ads for
-        MaxAdView adView = new MaxAdView( id, MaxAdFormat.MREC, sdk, activity );
+        MaxAdView adView = new MaxAdView( id, MaxAdFormat.MREC, sdk, getActivity() );
 
         // Optional: Set listeners
         adView.setListener( new MaxAdViewAdListener() {
@@ -450,7 +449,7 @@ public class AppLovinMax extends GodotPlugin
                 }
             });
 
-        FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(AppLovinSdkUtils.dpToPx(activity, 300), AppLovinSdkUtils.dpToPx(activity, 250));
+        FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(AppLovinSdkUtils.dpToPx(getActivity(), 300), AppLovinSdkUtils.dpToPx(getActivity(), 250));
         adParams.gravity = gravity;
         adView.setBackgroundColor(/* Color.WHITE */Color.TRANSPARENT);
         layoutParams.put(id, adParams);
@@ -464,7 +463,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void loadMREC(final String id, final int gravity, final int callback_id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(!mrecs.containsKey(id)) {
                         MaxAdView adView = initMREC(id, gravity, callback_id);
@@ -483,7 +482,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void showMREC(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(mrecs.containsKey(id)) {
                         MaxAdView b = mrecs.get(id);
@@ -501,7 +500,7 @@ public class AppLovinMax extends GodotPlugin
 
     public void removeMREC(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(mrecs.containsKey(id)) {
                         MaxAdView b = mrecs.get(id);
@@ -519,7 +518,7 @@ public class AppLovinMax extends GodotPlugin
      * ********************************************************************** */
     private MaxInterstitialAd initInterstitial(final String id, final int callback_id)
     {
-        MaxInterstitialAd interstitial = new MaxInterstitialAd( id, sdk, activity );
+        MaxInterstitialAd interstitial = new MaxInterstitialAd( id, sdk, getActivity() );
         interstitial.setListener(new MaxAdListener() {
                 @Override
                 public void onAdLoaded(final MaxAd maxAd) {
@@ -560,7 +559,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void loadInterstitial(final String id, final int callback_id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     // Load an ad for a given zone
                     MaxInterstitialAd interstitial = initInterstitial(id, callback_id);
@@ -575,7 +574,7 @@ public class AppLovinMax extends GodotPlugin
      */
     public void showInterstitial(final String id)
     {
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
                 @Override public void run() {
                     if(interstitials.containsKey(id)) {
                         MaxInterstitialAd interstitial = interstitials.get(id);
@@ -596,7 +595,6 @@ public class AppLovinMax extends GodotPlugin
     public AppLovinMax(Godot godot) 
     {
         super(godot);
-        activity = godot;
     }
 
     @Override
