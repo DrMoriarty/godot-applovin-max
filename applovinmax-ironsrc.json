@@ -1,0 +1,23 @@
+{
+  "name": "applovinmax-ironsrc",
+  "display_name": "AppLovin-Max IronSource",
+  "description": "IronSource adapter for AppLovin-Max plugin.",
+  "version": "0.1.1",
+  "godot_version": "3.3.0",
+  "license": "MIT",
+  "url": "https://github.com/DrMoriarty/godot-applovinmax.git",
+  "category": "misc",
+  "author": {
+    "name": "DrMoriarty",
+    "url": "https://github.com/DrMoriarty",
+    "donate": "https://ko-fi.com/drmoriarty"
+  },
+  "dependencies": [
+    "applovinmax"
+  ],
+  "platform_android": {
+    "files": {
+      "android-plugin/AppLovinMax-IronSource.gdap": "android/plugins/"
+    }
+  }
+}

@@ -1,9 +1,17 @@
 {
   "name": "applovinmax-facebook",
+  "display_name": "AppLovin-Max Facebook",
   "description": "Facebook Audience Network adapter for AppLovin-Max plugin.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
+  "godot_version": "3.3.0",
   "url": "https://github.com/DrMoriarty/godot-applovinmax.git",
+  "category": "misc",
+  "author": {
+    "name": "DrMoriarty",
+    "url": "https://github.com/DrMoriarty",
+    "donate": "https://ko-fi.com/drmoriarty"
+  },
   "dependencies": [
     "applovinmax"
   ],

@@ -8,7 +8,7 @@ binary="AppLovinMax.release.aar"
 
 local=[]
 remote=[
-  "com.applovin:applovin-sdk:9.14.6",
+  "com.applovin:applovin-sdk:10.0.1",
   "com.android.support:recyclerview-v7:28.+",
   "com.android.support:appcompat-v7:28.+",
   "com.squareup.picasso:picasso:2.5.2",

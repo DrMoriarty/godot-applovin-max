@@ -9,7 +9,5 @@ binary="com.applovin.mediation:ironsource-adapter:+"
 local=[]
 remote=[]
 custom_maven_repos=[
-  "https://applovin.bintray.com/Android-Adapter-SDKs",
-  "https://fyber.bintray.com/marketplace",
-  "https://adcolony.bintray.com/AdColony"
+  "https://applovin.bintray.com/Android-Adapter-SDKs"
 ]

@@ -1,9 +1,17 @@
 {
   "name": "applovinmax",
+  "display_name": "AppLovin-Max",
   "description": "AppLovin-Max plugin. Ad mediation and header-bidding solution.",
   "version": "0.1.1",
+  "godot_version": "3.3.0",
   "license": "MIT",
-  "url": "https://github.com/DrMoriarty/godot-applovinmax.git",
+  "url": "https://github.com/DrMoriarty/godot-applovin-max.git",
+  "category": "misc",
+  "author": {
+    "name": "DrMoriarty",
+    "url": "https://github.com/DrMoriarty",
+    "donate": "https://ko-fi.com/drmoriarty"
+  },
   "dependencies": [
   ],
   "files": {
