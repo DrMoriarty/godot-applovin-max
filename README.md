@@ -8,9 +8,11 @@ You should have AppLovinMAX account in order to use this module https://www.appl
 
 2. Find `APPLOVINMAX` in plugins list and press "Install" button.
 
-3. Set your SDK key in plugin variables list.
+3. Set your SDK key in plugin variables list (see https://dash.applovin.com/o/account#keys).
 
-4. Enable **Custom Build** for using in Android.
+4. Enable **Custom Build** and check **Plugins/App Lovin Max** for using in Android.
+
+5. Add **res://addons/applovinmax-ios** to export resources for using in iOS.
 
 ## Installation using NativeLib-CLI
 
@@ -18,9 +20,16 @@ You should have AppLovinMAX account in order to use this module https://www.appl
 
 2. Make `nativelib -i applovinmax` in your project directory.
 
-3. Set `AppLovin/SdkKey` in your project settings.
+3. Set `AppLovin/SdkKey` in your project settings (see https://dash.applovin.com/o/account#keys).
 
-4. Enable **Custom Build** for using in Android.
+4. Enable **Custom Build** and check **Plugins/App Lovin Max** for using in Android.
+
+5. Add **res://addons/applovinmax-ios** to export resources for using in iOS.
+
+## Notes
+1. Permission **ACCESS_COARSE_LOCATION** will automatically be added when exporting to Android.
+
+2. For iOS, consider using the ATT plugin (https://github.com/DrMoriarty/godot-ios-att) (required by Apple for iOS 14.0+).
 
 ## Adapters
 
