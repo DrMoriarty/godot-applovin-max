@@ -125,6 +125,8 @@ Remove MREC view from the screen.
 
 When load ad you specified instance_id of callback object. This object can have methods to get callbacks from the SDK.
 
+For example: `applovin_max.loadBanner("zone_id", true, self.get_instance_id())`
+
 ### Rewarded video callbacks
 
 _on_rewarded_video_ad_loaded(id: String)
