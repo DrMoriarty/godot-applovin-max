@@ -23,6 +23,7 @@ import org.godotengine.godot.GodotLib;
 import org.godotengine.godot.plugin.GodotPlugin;
 import org.godotengine.godot.plugin.SignalInfo;
 
+import com.applovin.mediation.MaxError;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
@@ -69,7 +70,7 @@ public class AppLovinMax extends GodotPlugin
 
         this.ProductionMode = ProductionMode;
         layout = (FrameLayout)getActivity().getWindow().getDecorView().getRootView();
-        sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(), getActivity());
+        sdk = AppLovinSdk.getInstance(sdkKey, new AppLovinSdkSettings(null), getActivity());
         //if(!ProductionMode) sdk.getSettings().setVerboseLogging( true );
         sdk.setMediationProvider( AppLovinMediationProvider.MAX );
         sdk.initializeSdk(new AppLovinSdk.SdkInitializationListener() {
@@ -139,18 +140,6 @@ public class AppLovinMax extends GodotPlugin
                     GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_loaded", new Object[] { id });
                 }
                 @Override
-                public void onAdLoadFailed(final String adUnitId, final int errorCode) {
-                    // Rewarded ad failed to load. We recommend retrying with exponentially higher delays.
-                    Log.i(TAG, "Rewarded: onAdLoadFailed");
-                    GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_failed_to_load", new Object[] { id, ""+errorCode });
-                }
-                @Override
-                public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
-                    // Rewarded ad failed to display. We recommend loading the next ad
-                    Log.i(TAG, "Rewarded: onAdDisplayFailed");
-                    GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_failed_to_load", new Object[] { id, ""+errorCode });
-                }
-                @Override
                 public void onAdDisplayed(final MaxAd maxAd) {
                     Log.i(TAG, "Rewarded: onAdDisplayed");
                     GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_opened", new Object[] { id });
@@ -160,6 +149,21 @@ public class AppLovinMax extends GodotPlugin
                     Log.i(TAG, "Rewarded: onAdClicked");
                     GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_left_application", new Object[] { id });
                 }
+
+                @Override
+                public void onAdLoadFailed(String adUnitId, MaxError error) {
+                    // Rewarded ad failed to load. We recommend retrying with exponentially higher delays.
+                    Log.i(TAG, "Rewarded: onAdLoadFailed");
+                    GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_failed_to_load", new Object[] { id, " "+ error });
+                }
+
+                @Override
+                public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                    // Rewarded ad failed to display. We recommend loading the next ad
+                    Log.i(TAG, "Rewarded: onAdDisplayFailed");
+                    GodotLib.calldeferred(callback_id, "_on_rewarded_video_ad_failed_to_load", new Object[] { id, " "+error });
+                }
+
                 @Override
                 public void onAdHidden(final MaxAd maxAd) {
                     // rewarded ad is hidden. Pre-load the next ad
@@ -233,17 +237,7 @@ public class AppLovinMax extends GodotPlugin
                     GodotLib.calldeferred(callback_id, "_on_banner_loaded", new Object[]{ id });
                 }
                 @Override
-                public void onAdLoadFailed(final String adUnitId, final int errorCode) {
-                    Log.w(TAG, "Banner: onAdLoadFailed");
-                    GodotLib.calldeferred(callback_id, "_on_banner_failed_to_load", new Object[]{ id, ""+errorCode });
-                }
-                @Override
                 public void onAdHidden(final MaxAd maxAd) {
-                }
-                @Override
-                public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
-                    Log.w(TAG, "Banner: onAdDisplayFailed");
-                    GodotLib.calldeferred(callback_id, "_on_banner_failed_to_load", new Object[]{ id, ""+errorCode });
                 }
                 @Override
                 public void onAdDisplayed(final MaxAd maxAd) {
@@ -253,7 +247,20 @@ public class AppLovinMax extends GodotPlugin
                 @Override
                 public void onAdClicked(final MaxAd maxAd) {
                 }
+
                 @Override
+                public void onAdLoadFailed(String adUnitId, MaxError error) {
+                    Log.w(TAG, "Banner: onAdLoadFailed");
+                    GodotLib.calldeferred(callback_id, "_on_banner_failed_to_load", new Object[]{ id, ""+ error.getMessage() });
+                }
+
+                @Override
+                public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                    Log.w(TAG, "Banner: onAdLoadFailed");
+                    GodotLib.calldeferred(callback_id, "_on_banner_failed_to_load", new Object[]{ id, ""+error.getMessage() });
+                }
+
+            @Override
                 public void onAdExpanded(final MaxAd maxAd) {
                 }
                 @Override
@@ -425,15 +432,7 @@ public class AppLovinMax extends GodotPlugin
                     GodotLib.calldeferred(callback_id, "_on_mrec_loaded", new Object[]{ id });
                 }
                 @Override
-                public void onAdLoadFailed(final String adUnitId, final int errorCode) {
-                    Log.w(TAG, "MREC: onAdLoadFailed");
-                    GodotLib.calldeferred(callback_id, "_on_mrec_failed_to_load", new Object[]{ id, ""+errorCode });
-                }
-                @Override
                 public void onAdHidden(final MaxAd maxAd) {
-                }
-                @Override
-                public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
                 }
                 @Override
                 public void onAdDisplayed(final MaxAd maxAd) {
@@ -441,7 +440,19 @@ public class AppLovinMax extends GodotPlugin
                 @Override
                 public void onAdClicked(final MaxAd maxAd) {
                 }
-                @Override
+
+            @Override
+            public void onAdLoadFailed(String adUnitId, MaxError error) {
+                        Log.w(TAG, "MREC: onAdLoadFailed");
+                        GodotLib.calldeferred(callback_id, "_on_mrec_failed_to_load", new Object[]{ id, ""+error.getMessage() });
+                    }
+
+            @Override
+            public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+
+            }
+
+            @Override
                 public void onAdExpanded(final MaxAd maxAd) {
                 }
                 @Override
@@ -527,16 +538,6 @@ public class AppLovinMax extends GodotPlugin
                     GodotLib.calldeferred(callback_id, "_on_interstitial_loaded", new Object[] { id });
                 }
                 @Override
-                public void onAdLoadFailed(final String adUnitId, final int errorCode) {
-                    Log.i(TAG, "Interstitial: onAdLoadFailed");
-                    GodotLib.calldeferred(callback_id, "_on_interstitial_failed_to_load", new Object[] { id, ""+errorCode });
-                }
-                @Override
-                public void onAdDisplayFailed(final MaxAd maxAd, final int errorCode) {
-                    Log.i(TAG, "Interstitial: onAdDisplayFailed");
-                    GodotLib.calldeferred(callback_id, "_on_interstitial_failed_to_load", new Object[] { id, ""+errorCode });
-                }
-                @Override
                 public void onAdDisplayed(final MaxAd maxAd) {
                     Log.i(TAG, "Interstitial: onAdDisplayed");
                 }
@@ -544,7 +545,20 @@ public class AppLovinMax extends GodotPlugin
                 public void onAdClicked(final MaxAd maxAd) {
                     Log.i(TAG, "Interstitial: onAdClicked");
                 }
-                @Override
+
+            @Override
+            public void onAdLoadFailed(String adUnitId, MaxError error) {
+                Log.i(TAG, "Interstitial: onAdLoadFailed");
+                GodotLib.calldeferred(callback_id, "_on_interstitial_failed_to_load", new Object[] { id, ""+error.getMessage() });
+            }
+
+            @Override
+            public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                Log.i(TAG, "Interstitial: onAdDisplayFailed");
+                GodotLib.calldeferred(callback_id, "_on_interstitial_failed_to_load", new Object[] { id, ""+error.getMessage() });
+            }
+
+            @Override
                 public void onAdHidden(final MaxAd maxAd) {
                     Log.i(TAG, "Interstitial: onAdHidden");
                     GodotLib.calldeferred(callback_id, "_on_interstitial_close", new Object[] { id });
