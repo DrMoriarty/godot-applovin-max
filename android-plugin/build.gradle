@@ -19,12 +19,12 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.1"
+    compileSdkVersion 30
+    buildToolsVersion '30.0.3'
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
@@ -48,7 +48,7 @@ dependencies {
      library when building the final binary.
      */
     compileOnly fileTree(dir: 'libs', include: ['godot-lib*.aar'])
-    implementation 'com.applovin:applovin-sdk:10.0.1'
+    implementation 'com.applovin:applovin-sdk:11.4.4'
 }
 
 group = 'ru.mobilap.godot'
