@@ -19,12 +19,12 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.3'
+    compileSdkVersion 32
+    buildToolsVersion '32.0.0'
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
     }
@@ -47,8 +47,8 @@ dependencies {
      necessary since the Godot editor will also provide a version of the godot
      library when building the final binary.
      */
-    compileOnly fileTree(dir: 'libs', include: ['godot-lib*.aar'])
-    implementation 'com.applovin:applovin-sdk:11.4.4'
+    implementation 'io.github.m4gr3d:godot:3.5.1.stable'
+    implementation 'com.applovin:applovin-sdk:11.5.4'
 }
 
 group = 'ru.mobilap.godot'
