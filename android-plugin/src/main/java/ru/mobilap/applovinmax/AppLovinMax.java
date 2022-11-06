@@ -22,6 +22,7 @@ import org.godotengine.godot.Godot;
 import org.godotengine.godot.GodotLib;
 import org.godotengine.godot.plugin.GodotPlugin;
 import org.godotengine.godot.plugin.SignalInfo;
+import org.godotengine.godot.plugin.UsedByGodot;
 
 import com.applovin.mediation.MaxError;
 import com.applovin.sdk.AppLovinMediationProvider;
@@ -66,6 +67,7 @@ public class AppLovinMax extends GodotPlugin
      * @param boolean ProductionMode Tell if the enviroment is for real or test
      * @param int gdscript instance id
      */
+    @UsedByGodot
     public void init(final String sdkKey, boolean ProductionMode) {
 
         this.ProductionMode = ProductionMode;
@@ -97,30 +99,31 @@ public class AppLovinMax extends GodotPlugin
             } );
     }
 
+    @UsedByGodot
     public boolean isInited() {
         return _inited;
     }
-
+    @UsedByGodot
     public void setUserId(final String uid) {
         sdk.setUserIdentifier( uid );
     }
-
+    @UsedByGodot
     public boolean isGdprApplies() {
         return gdprApplies;
     }
-    
+    @UsedByGodot
     public void debugMediation() {
         sdk.showMediationDebugger();
     }
-
+    @UsedByGodot
     public void setGdprConsent(final boolean consent) {
         AppLovinPrivacySettings.setHasUserConsent( consent, getActivity() );
     }
-
+    @UsedByGodot
     public void setAgeRestricted(final boolean ageRestricted) {
         AppLovinPrivacySettings.setIsAgeRestrictedUser( ageRestricted, getActivity() );
     }
-
+    @UsedByGodot
     public void setCCPAApplied(final boolean ccpaApplied) {
         AppLovinPrivacySettings.setDoNotSell( ccpaApplied, getActivity() );
     }
@@ -284,6 +287,7 @@ public class AppLovinMax extends GodotPlugin
      * @param String id AdMod Banner ID
      * @param boolean isOnTop To made the banner top or bottom
      */
+    @UsedByGodot
     public void loadBanner(final String id, final boolean isOnTop, final int callback_id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -303,6 +307,7 @@ public class AppLovinMax extends GodotPlugin
     /**
      * Show the banner
      */
+    @UsedByGodot
     public void showBanner(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -331,7 +336,7 @@ public class AppLovinMax extends GodotPlugin
                 }
             });
     }
-
+    @UsedByGodot
     public void removeBanner(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -351,6 +356,7 @@ public class AppLovinMax extends GodotPlugin
     /**
      * Hide the banner
      */
+    @UsedByGodot
     public void hideBanner(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -371,6 +377,7 @@ public class AppLovinMax extends GodotPlugin
      * Get the banner width
      * @return int Banner width
      */
+    @UsedByGodot
     public int getBannerWidth(final String id)
     {
         if(banners.containsKey(id)) {
@@ -395,6 +402,7 @@ public class AppLovinMax extends GodotPlugin
      * Get the banner height
      * @return int Banner height
      */
+    @UsedByGodot
     public int getBannerHeight(final String id)
     {
         if(banners.containsKey(id)) {
@@ -472,6 +480,7 @@ public class AppLovinMax extends GodotPlugin
      * @param String id AdMod Banner ID
      * @param boolean isOnTop To made the banner top or bottom
      */
+    @UsedByGodot
     public void loadMREC(final String id, final int gravity, final int callback_id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -491,6 +500,7 @@ public class AppLovinMax extends GodotPlugin
     /**
      * Show the banner
      */
+    @UsedByGodot
     public void showMREC(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -508,7 +518,7 @@ public class AppLovinMax extends GodotPlugin
                 }
             });
     }
-
+    @UsedByGodot
     public void removeMREC(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -571,6 +581,7 @@ public class AppLovinMax extends GodotPlugin
      * Load a interstitial
      * @param String id AdMod Interstitial ID
      */
+    @UsedByGodot
     public void loadInterstitial(final String id, final int callback_id)
     {
         getActivity().runOnUiThread(new Runnable() {
@@ -586,6 +597,7 @@ public class AppLovinMax extends GodotPlugin
     /**
      * Show the interstitial
      */
+    @UsedByGodot
     public void showInterstitial(final String id)
     {
         getActivity().runOnUiThread(new Runnable() {
